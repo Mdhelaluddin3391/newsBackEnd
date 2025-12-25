@@ -1,3 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.env/
 .venv/
-venv/bin/python
-venv
+
+# Environment variables
+.env
+.env.*
+
+# Django
+db.sqlite3
+staticfiles/
+media/
+
+# Migrations (optional)
+# */migrations/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/

@@ -8,8 +8,9 @@ class User(AbstractUser):
         EDITOR = "editor", "Editor"
         ADMIN = "admin", "Admin"
 
-    role = models.CharField(
-        max_length=20,
-        choices=Role.choices,
-        default=Role.READER
-    )
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.READER)
+    bio = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+
+    def __str__(self):
+        return self.username

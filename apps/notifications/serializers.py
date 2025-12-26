@@ -1,25 +1,12 @@
 from rest_framework import serializers
 from .models import Notification, NotificationPreference
 
-
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = [
-            "id",
-            "title",
-            "message",
-            "type",
-            "is_read",
-            "created_at",
-        ]
-
+        fields = ["id", "title", "message", "type", "is_read", "created_at"]
 
 class NotificationPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationPreference
-        fields = [
-            "email_enabled",
-            "in_app_enabled",
-            "push_enabled",
-        ]
+        fields = ["email_enabled", "in_app_enabled", "push_enabled"]

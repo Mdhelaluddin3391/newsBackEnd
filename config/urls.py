@@ -26,11 +26,9 @@ def health_check(request):
         "version": "v1"
     })
 
-    
+
+
 urlpatterns = [
-    path("", health_check),
-
-
     path('admin/', admin.site.urls),
     path("api/v1/users/", include("apps.users.urls")),
     path("api/v1/news/", include("apps.news.urls")),

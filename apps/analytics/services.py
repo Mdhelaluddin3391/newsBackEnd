@@ -1,25 +1,38 @@
-from datetime import timedelta
-from django.utils import timezone
 from django.db.models import Count
-from .models import ArticleView
+from django.utils import timezone
+
+from .models import ArticleViewEvent, ArticleAnalytics
 from apps.news.models import Article
 
-def record_article_view(article, user=None, ip_address=None):
-    ArticleView.objects.create(
+
+def record_view(*, article, user, session_id, ip, user_agent):
+    ArticleViewEvent.objects.create(
         article=article,
-        user=user if user and user.is_authenticated else None,
-        ip_address=ip_address,
+        user=user,
+        session_id=session_id,
+        ip_address=ip,
+        user_agent=user_agent,
     )
-    # Increment count for faster retrieval
-    article.view_count += 1
-    article.save()
 
-def get_popular_articles(limit=10):
-    return Article.objects.filter(status="published").order_by("-view_count")[:limit]
 
-def get_trending_articles(days=3, limit=10):
-    since = timezone.now() - timedelta(days=days)
-    return Article.objects.filter(
-        status="published",
-        views__created_at__gte=since
-    ).annotate(recent_views=Count("views")).order_by("-recent_views")[:limit]
+def recalculate_article_analytics(article_id):
+    article = Article.objects.get(id=article_id)
+
+    events = ArticleViewEvent.objects.filter(article=article)
+
+    total_views = events.count()
+    unique_users = events.exclude(user=None).values("user").distinct().count()
+
+    analytics, _ = ArticleAnalytics.objects.get_or_create(article=article)
+
+    analytics.total_views = total_views
+    analytics.unique_users = unique_users
+    analytics.last_calculated_at = timezone.now()
+    analytics.save(
+        update_fields=[
+            "total_views",
+            "unique_users",
+            "last_calculated_at",
+            "updated_at",
+        ]
+    )

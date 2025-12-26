@@ -28,13 +28,26 @@ def health_check(request):
 
 
 
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
     path("api/v1/users/", include("apps.users.urls")),
     path("api/v1/news/", include("apps.news.urls")),
     path("api/v1/comments/", include("apps.comments.urls")),
-    path("api/v1/reactions/", include("apps.reactions.urls")),
-    path("api/v1/search/", include("apps.search.urls")),
-    path("api/v1/analytics/", include("apps.analytics.urls")),
     path("api/v1/notifications/", include("apps.notifications.urls")),
+    path("api/v1/analytics/", include("apps.analytics.urls")),
+    path("api/v1/search/", include("apps.search.urls")),
+]
+
+
+
+
+from rest_framework_simplejwt.views import TokenRefreshView
+
+urlpatterns += [
+    path(
+        "api/v1/users/auth/token/refresh/",
+        TokenRefreshView.as_view(),
+        name="token_refresh"
+    ),
 ]

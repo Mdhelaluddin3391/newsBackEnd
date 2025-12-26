@@ -1,19 +1,19 @@
 from rest_framework import serializers
-from apps.news.models import Article
+from .models import SearchIndex
 
 
-class SearchArticleSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField()
-    author = serializers.StringRelatedField()
+class SearchResultSerializer(serializers.ModelSerializer):
+    article_id = serializers.IntegerField(source="article.id")
+    slug = serializers.CharField(source="article.slug")
 
     class Meta:
-        model = Article
-        fields = [
-            "id",
-            "title",
+        model = SearchIndex
+        fields = (
+            "article_id",
             "slug",
+            "title",
             "summary",
             "category",
-            "author",
+            "article_type",
             "published_at",
-        ]
+        )

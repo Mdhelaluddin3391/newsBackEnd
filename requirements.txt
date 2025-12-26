@@ -21,3 +21,14 @@ sqlparse==0.5.5
 typing_extensions==4.15.0
 urllib3==2.6.2
 cryptography
+django-storages
+boto3
+django-ckeditor
+ckeditor
+ckeditor-
+dj-rest-auth
+django-allauth
+djangorestframework-simplejwt
+google-auth
+
+djangorestframework-simplejwt[token_blacklist]

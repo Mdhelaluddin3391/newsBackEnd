@@ -1,47 +1,45 @@
 from django.db import models
 from django.conf import settings
-from apps.core.models import TimeStampedModel
 
-User = settings.AUTH_USER_MODEL
+from apps.core.models import TimeStampedModel, SoftDeleteModel
+from apps.news.models import Article
 
 
-class Notification(TimeStampedModel):
+class Notification(TimeStampedModel, SoftDeleteModel):
     class Type(models.TextChoices):
-        SYSTEM = "system", "System"
-        NEWS = "news", "News"
-        COMMENT = "comment", "Comment"
+        BREAKING_NEWS = "BREAKING_NEWS", "Breaking News"
+        COMMENT_REPLY = "COMMENT_REPLY", "Comment Reply"
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="notifications"
+    )
+
+    notification_type = models.CharField(
+        max_length=50,
+        choices=Type.choices
     )
 
     title = models.CharField(max_length=255)
     message = models.TextField()
 
-    type = models.CharField(
-        max_length=20,
-        choices=Type.choices,
-        default=Type.SYSTEM
+    article = models.ForeignKey(
+        Article,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
     )
 
-    is_read = models.BooleanField(default=False)
+    is_sent = models.BooleanField(default=False)
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["notification_type"]),
+            models.Index(fields=["is_sent"]),
+        ]
 
     def __str__(self):
-        return f"Notification({self.user}, {self.title})"
-
-
-class NotificationPreference(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name="notification_pref"
-    )
-
-    email_enabled = models.BooleanField(default=True)
-    in_app_enabled = models.BooleanField(default=True)
-    push_enabled = models.BooleanField(default=False)  # future
-
-    def __str__(self):
-        return f"Preferences({self.user})"
+        return f"{self.notification_type} → {self.user.email}"

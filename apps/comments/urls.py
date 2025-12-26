@@ -1,13 +1,10 @@
-from django.urls import path
-from .api import CommentListAPIView, CommentCreateAPIView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .api import CommentViewSet
+
+router = DefaultRouter()
+router.register("comments", CommentViewSet, basename="comments")
 
 urlpatterns = [
-    path(
-        "article/<int:article_id>/",
-        CommentListAPIView.as_view(),
-    ),
-    path(
-        "create/",
-        CommentCreateAPIView.as_view(),
-    ),
+    path("", include(router.urls)),
 ]

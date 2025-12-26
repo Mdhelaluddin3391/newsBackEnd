@@ -1,20 +1,20 @@
-from django.urls import path
-from .api import (
-    CategoryListAPIView,
-    ArticleListAPIView,
-    ArticleDetailAPIView,
-    ArticleCreateAPIView,
-    ArticleSubmitForReviewAPIView,
-    ArticlePublishAPIView,
-)
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .api import ArticleViewSet
+
+router = DefaultRouter()
+router.register("articles", ArticleViewSet, basename="articles")
 
 urlpatterns = [
-    path("categories/", CategoryListAPIView.as_view()),
+    path("", include(router.urls)),
+]
 
-    path("articles/", ArticleListAPIView.as_view()),
-    path("articles/<slug:slug>/", ArticleDetailAPIView.as_view()),
 
-    path("articles/create/", ArticleCreateAPIView.as_view()),
-    path("articles/<int:pk>/submit/", ArticleSubmitForReviewAPIView.as_view()),
-    path("articles/<int:pk>/publish/", ArticlePublishAPIView.as_view()),
+from django.urls import path
+from .views import home, article_detail, category_page
+
+urlpatterns = [
+    path("", home, name="home"),
+    path("news/<slug:slug>/", article_detail, name="article_detail"),
+    path("category/<slug:slug>/", category_page, name="category_page"),
 ]

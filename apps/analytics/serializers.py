@@ -1,16 +1,14 @@
 from rest_framework import serializers
-from apps.news.models import Article
+from .models import ArticleAnalytics
 
 
-class AnalyticsArticleSerializer(serializers.ModelSerializer):
-    view_count = serializers.IntegerField()
-
+class ArticleAnalyticsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Article
-        fields = [
-            "id",
-            "title",
-            "slug",
-            "view_count",
-            "published_at",
-        ]
+        model = ArticleAnalytics
+        fields = (
+            "total_views",
+            "unique_users",
+            "total_read_time",
+            "bounce_rate",
+            "last_calculated_at",
+        )

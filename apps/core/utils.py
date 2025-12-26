@@ -1,5 +1,20 @@
-from django.utils.text import slugify
-import uuid
+from .models import AuditLog
 
-def unique_slug(text: str) -> str:
-    return f"{slugify(text)}-{uuid.uuid4().hex[:6]}"
+
+def create_audit_log(
+    *,
+    user=None,
+    action,
+    model_name,
+    object_id,
+    description="",
+    ip_address=None
+):
+    AuditLog.objects.create(
+        user=user,
+        action=action,
+        model_name=model_name,
+        object_id=str(object_id),
+        description=description,
+        ip_address=ip_address,
+    )

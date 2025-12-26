@@ -1,7 +1,10 @@
-from django.urls import path
-from .api import PopularArticlesAPIView, TrendingArticlesAPIView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .api import ArticleAnalyticsViewSet
+
+router = DefaultRouter()
+router.register("articles", ArticleAnalyticsViewSet, basename="article-analytics")
 
 urlpatterns = [
-    path("popular/", PopularArticlesAPIView.as_view()),
-    path("trending/", TrendingArticlesAPIView.as_view()),
+    path("", include(router.urls)),
 ]

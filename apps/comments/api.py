@@ -1,23 +1,40 @@
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import Comment
-from .serializers import CommentSerializer, CommentCreateSerializer
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-class CommentListAPIView(generics.ListAPIView):
+from .models import Comment
+from .serializers import CommentSerializer
+
+
+class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Sirf main comments (jinka koi parent nahi hai) dikhayenge
         return Comment.objects.filter(
-            article_id=self.kwargs["article_id"],
-            parent__isnull=True,
-            is_active=True
-        )
-
-class CommentCreateAPIView(generics.CreateAPIView):
-    serializer_class = CommentCreateSerializer
-    permission_classes = [IsAuthenticated]
+            is_deleted=False
+        ).select_related("user", "article")
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def edit(self, request, pk=None):
+        comment = self.get_object()
+        new_content = request.data.get("content")
+
+        try:
+            comment.edit(new_content)
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(CommentSerializer(comment).data)
+
+    @action(detail=True, methods=["post"])
+    def report(self, request, pk=None):
+        comment = self.get_object()
+        comment.report()
+        return Response({"detail": "Comment reported successfully"})

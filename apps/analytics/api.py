@@ -1,34 +1,13 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.core.cache import cache
+from rest_framework import viewsets, permissions
 
-from .services import get_popular_articles, get_trending_articles
-from .serializers import AnalyticsArticleSerializer
+from .models import ArticleAnalytics
+from .serializers import ArticleAnalyticsSerializer
+from apps.users.permissions import IsAdmin, IsEditor
 
 
-class PopularArticlesAPIView(APIView):
-    permission_classes = [AllowAny]
+class ArticleAnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ArticleAnalyticsSerializer
+    permission_classes = [permissions.IsAuthenticated, IsEditor | IsAdmin]
 
-    def get(self, request):
-        cache_key = "popular_articles"
-        cached = cache.get(cache_key)
-
-        if cached:
-            return Response(cached)
-
-        articles = get_popular_articles()
-        data = AnalyticsArticleSerializer(articles, many=True).data
-        cache.set(cache_key, data, 600)
-
-        return Response(data)
-
-
-class TrendingArticlesAPIView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        days = int(request.query_params.get("days", 3))
-        articles = get_trending_articles(days=days)
-        data = AnalyticsArticleSerializer(articles, many=True).data
-        return Response(data)
+    def get_queryset(self):
+        return ArticleAnalytics.objects.filter(is_deleted=False)

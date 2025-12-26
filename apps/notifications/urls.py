@@ -1,12 +1,10 @@
-from django.urls import path
-from .api import (
-    NotificationListAPIView,
-    MarkNotificationReadAPIView,
-    NotificationPreferenceAPIView,
-)
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .api import NotificationViewSet
+
+router = DefaultRouter()
+router.register("", NotificationViewSet, basename="notifications")
 
 urlpatterns = [
-    path("", NotificationListAPIView.as_view()),
-    path("<int:pk>/read/", MarkNotificationReadAPIView.as_view()),
-    path("preferences/", NotificationPreferenceAPIView.as_view()),
+    path("", include(router.urls)),
 ]
